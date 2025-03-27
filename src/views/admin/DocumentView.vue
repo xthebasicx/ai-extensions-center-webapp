@@ -29,7 +29,7 @@ ai_extensions_center_menu.add_item("Validate License") { SketchupHome::AiExtensi
       </section>
 
       <section class="mb-6 p-5 border-l-8 border-purple-600 bg-purple-50 rounded-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-3">📜 Example </h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">📜 Example loader file</h2>
         <pre class="bg-gray-900 text-green-400 p-4 rounded-md text-sm overflow-auto">
 require 'sketchup.rb'
 require 'extensions.rb'

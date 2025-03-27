@@ -12,9 +12,9 @@
 defineProps({
     extension: Object,
 });
-const backendBaseUrl = "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const getImageUrl = (imageUrl) => {
-    return backendBaseUrl + "/uploads" + imageUrl;
+    return BASE_URL + "/uploads" + imageUrl;
 };
 </script>
