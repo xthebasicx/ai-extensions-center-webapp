@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { AuthService } from '@/services/auth'
 import AdminLogin from '../views/admin/login/LoginView.vue'
 import AdminForgotpassword from '../views/admin/login/ForgotpasswordView.vue'
@@ -12,7 +12,7 @@ import AdminExtensionCreate from '../views/admin/extension/UpdateView.vue'
 import AdminExtensionUpdate from '../views/admin/extension/UpdateView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/admin/login',

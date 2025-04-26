@@ -4,9 +4,9 @@ const BASE_URL = import.meta.env.VITE_API_URL
 const API_URL = `${BASE_URL}/api/Extensions`
 
 export const ExtensionService = {
-    async fetchExtensions(pageNumber = 1, pageSize = 10) {
+    async fetchExtensionsWithPagination(pageNumber = 1, pageSize = 10) {
         try {
-            const response = await axios.get(API_URL, { params: { pageNumber, pageSize } })
+            const response = await axios.get(`${API_URL}/paginated`, { params: { pageNumber, pageSize } })
             return response.data
         } catch (error) { }
     },
@@ -19,11 +19,20 @@ export const ExtensionService = {
             return response.data
         } catch (error) { }
     },
-    async fetchExtensionByUserId(pageNumber = 1, pageSize = 10) {
+    async fetchExtensionWithPaginationByUserId(pageNumber = 1, pageSize = 10) {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await axios.get(`${API_URL}/user-paginated`, {
+                params: { pageNumber, pageSize },
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            return response.data
+        } catch (error) { }
+    },
+    async fetchExtensionByUserId() {
         try {
             const token = localStorage.getItem('accessToken');
             const response = await axios.get(`${API_URL}/user`, {
-                params: { pageNumber, pageSize },
                 headers: { 'Authorization': `Bearer ${token}` }
             })
             return response.data

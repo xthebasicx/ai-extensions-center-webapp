@@ -29,6 +29,13 @@
         <router-link :to="{ name: 'admin-login' }" class="text-blue-500 hover:underline">Sign In</router-link>
       </p>
     </div>
+
+    <el-dialog v-model="showModal" title="Registration Successful" width="400px" center>
+      <el-text>Please check your email to verify your account.</el-text>
+      <template #footer>
+        <el-button type="primary" @click="redirectToLogin">Go to Login</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -41,6 +48,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
+const showModal = ref(false)
 const router = useRouter()
 
 const handleRegister = async () => {
@@ -52,9 +60,14 @@ const handleRegister = async () => {
   try {
     const user = { email: email.value, password: password.value }
     await UserService.register(user)
-    router.push({ name: 'admin-login' })
+    showModal.value = true
   } catch (error) {
-    errorMessage.value = error.message
+    errorMessage.value = 'Registration failed.'
   }
+}
+
+const redirectToLogin = () => {
+  showModal.value = false
+  router.push({ name: 'admin-login' })
 }
 </script>

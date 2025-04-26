@@ -1,8 +1,12 @@
 <template>
-  <div class="p-8 bg-gray-100 min-h-screen flex flex-col">
-    <div class="bg-white shadow-xl rounded-lg p-6 w-full">
-      <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8">📌 How to Use Ai Extensions Center</h1>
+  <div class="flex flex-col gap-8 p-6">
+    <div v-for="(header, index) in headers" :key="index"
+      class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <div class="mb-4">
+        <h2 class="text-2xl font-bold text-blue-400">{{ header }}</h2>
+      </div>
 
+<<<<<<< Updated upstream
       <section class="mb-6 p-5 border-l-8 border-blue-600 bg-blue-50 rounded-lg">
         <h2 class="text-2xl font-bold text-gray-800 mb-3">🚀 Installation and Usage Steps</h2>
         <ul class="list-disc ml-6 text-gray-600">
@@ -88,9 +92,43 @@ def self.show_your_dialog
   end
 end</pre>
       </section>
+=======
+      <ul class="list-disc list-inside space-y-2 text-gray-700">
+        <li v-for="(listItem, listIndex) in lists[index]" :key="listIndex">
+          {{ listItem }}
+        </li>
+      </ul>
+>>>>>>> Stashed changes
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
+const headers = ref([
+  "Page Structure",
+  "Extension",
+  "License",
+]);
+
+const lists = ref([
+  [
+    "Dashboard: Overview of the system",
+    "Extensions: List all extensions with create button",
+    "Extensions Create: Form to create a new extension",
+    "Extensions Details: Extension details and license system",
+  ],
+  [
+    "In the extension creation page, users must fill out the following fields",
+    "Extension Name (must be unique)",
+    "Module Name (must be unique and it's not the same as the main module)",
+  ],
+  [
+    "Go to extension page",
+    "Click the 'Create License' button",
+    "Set the expiration date",
+    "Click 'Send Email' to deliver the license",
+  ],
+]);
 </script>

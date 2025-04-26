@@ -1,33 +1,33 @@
 <template>
-  <aside class="md:w-64 w-40 bg-white border-r border-gray-300 shadow-md h-full">
-    <nav class="p-6 flex flex-col h-full">
-      <ul class="flex-grow space-y-2">
-        <li>
-          <router-link :to="{ name: 'admin-dashboard' }" class="block p-2 hover:bg-gray-100 rounded">
-            Dashboard
-          </router-link>
-        </li>
-        <li>
-          <router-link :to="{ name: 'admin-extensions' }" class="block p-2 hover:bg-gray-100 rounded">
-            Extensions
-          </router-link>
-        </li>
-        <li>
-          <router-link :to="{ name: 'admin-document' }" class="block p-2 hover:bg-gray-100 rounded">
-            Document
-          </router-link>
-        </li>
-      </ul>
-      <button @click="handleLogout" class="w-full p-2 mt-auto text-left text-red-600 hover:bg-gray-100 rounded">
+  <div class="flex flex-col h-full">
+    <el-menu default-active="route.name" router>
+      <el-menu-item index="1" :route="{ name: 'admin-document' }">
+        <el-icon>
+          <document />
+        </el-icon>
+        <span>Document</span>
+      </el-menu-item>
+      <el-menu-item index="2" :route="{ name: 'admin-dashboard' }">
+        <el-icon><data-line /></el-icon>
+        <span>Dashboard</span>
+      </el-menu-item>
+      <el-menu-item index="3" :route="{ name: 'admin-extensions' }">
+        <el-icon><icon-menu /></el-icon>
+        <span>Extensions</span>
+      </el-menu-item>
+    </el-menu>
+    <div class="mt-auto p-4">
+      <el-button type="danger" plain @click="handleLogout" class="w-full">
         Sign out
-      </button>
-    </nav>
-  </aside>
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
 import { AuthService } from '@/services/auth';
+import { Document, DataLine, Menu as IconMenu } from '@element-plus/icons-vue'
 
 const router = useRouter();
 

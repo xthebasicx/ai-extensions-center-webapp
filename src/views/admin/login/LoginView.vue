@@ -52,7 +52,7 @@ const handleLogin = async () => {
     const redirectTo = router.currentRoute.value.query.redirect || { name: 'admin-dashboard' };
     router.push(redirectTo)
   } catch (error) {
-    errorMessage.value = 'Login failed. Please check your credentials.'
+    errorMessage.value = 'Login failed.'
   } finally {
     loading.value = false
   }

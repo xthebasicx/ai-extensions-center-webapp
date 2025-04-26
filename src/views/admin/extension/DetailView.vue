@@ -1,92 +1,175 @@
 <template>
   <div class="space-y-8">
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-bold">Extension Dashboard</h1>
-      <div class="flex space-x-4">
-        <button @click="downloadRubyFile"
-          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
-          Download Ruby File
-        </button>
-        <router-link :to="{ name: 'admin-extensions-update', params: { id: route.params.id } }"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-          Edit Extension
-        </router-link>
-      </div>
+
+    <!-- Bottom header -->
+    <div class="flex items-center justify-end mb-4">
+      <el-button size="large" @click="showDocument = !showDocument" :icon="Document">
+        Document
+      </el-button>
+      <el-button @click="downloadRubyFile" size="large" :icon="Download">
+        Download Ruby File
+      </el-button>
+      <el-button size="large" :tag="'router-link'" :icon="Edit"
+        :to="{ name: 'admin-extensions-update', params: { id: route.params.id } }">
+        Edit Extension
+      </el-button>
     </div>
-    <!-- Extension Information Section -->
-    <Section title="Extension Information">
-      <div>Name : {{ extension.name }}</div>
-      <div>Description : {{ extension.description }}</div>
-    </Section>
-    <!-- License Summary Section -->
-    <Section title="License Summary">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <dashboard-card title="Total Licenses" :value=licenses.length class="bg-blue-100"></dashboard-card>
-        <dashboard-card title="Inactive Licenses" :value=inactiveLicenses class="bg-gray-100"></dashboard-card>
-        <dashboard-card title="Active Licenses" :value=activeLicenses class="bg-green-100"></dashboard-card>
-        <dashboard-card title="Expired Licenses" :value=expiredLicenses class="bg-orange-100"></dashboard-card>
-        <dashboard-card title="Revoke Licenses" :value=revokedLicenses class="bg-red-100"></dashboard-card>
+
+    <!-- Document -->
+    <ExtensionDocument v-if="showDocument" class="mt-6" :module-name="extension.moduleName" />
+
+    <!-- Extension info -->
+    <el-card style="border-radius: 15px; box-shadow: var(--el-box-shadow-lighter);">
+      <template #header>
+        <el-text size="large" tag="b" type="primary">Extension Information</el-text>
+      </template>
+      <div><el-text>Name: {{ extension.name }}</el-text></div>
+      <div><el-text>Module Name: {{ extension.moduleName }}</el-text></div>
+      <div><el-text>Description: {{ extension.description }}</el-text></div>
+    </el-card>
+
+    <!-- License summary -->
+    <el-card style="border-radius: 15px; box-shadow: var(--el-box-shadow-lighter);">
+      <template #header>
+        <el-text size="large" tag="b" type="primary">License Summary</el-text>
+      </template>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 text-center">
+        <el-card shadow="never" style="border-radius: 15px; background-color: var(--el-color-primary-light-8);">
+          <div><el-text>{{ licenses.length }}</el-text></div>
+          <div><el-text>Total Licenses</el-text></div>
+        </el-card>
+        <el-card shadow="never" style="border-radius: 15px; background-color: var(--el-color-info-light-8);">
+          <div><el-text>{{ inactiveLicenses }}</el-text></div>
+          <div><el-text>Inactive Licenses</el-text></div>
+        </el-card>
+        <el-card shadow="never" style="border-radius: 15px; background-color: var(--el-color-success-light-8);">
+          <div><el-text>{{ activeLicenses }}</el-text></div>
+          <div><el-text>Active Licenses</el-text></div>
+        </el-card>
+        <el-card shadow="never" style="border-radius: 15px; background-color: var(--el-color-warning-light-8);">
+          <div><el-text>{{ expiredLicenses }}</el-text></div>
+          <div><el-text>Expired Licenses</el-text></div>
+        </el-card>
+        <el-card shadow="never" style="border-radius: 15px; background-color: var(--el-color-danger-light-8);">
+          <div><el-text>{{ revokedLicenses }}</el-text></div>
+          <div><el-text>Revoked Licenses</el-text></div>
+        </el-card>
       </div>
-    </Section>
-    <!-- Sende Email Section -->
-    <Section title="Send licensekey to email">
-      <form @submit.prevent="handleSendEmail">
-        <div class="mb-4">
-          <label for="" class="block mb-2">Email</label>
-          <input v-model="email" type="email" id="" class="border rounded border-gray-300 w-full px-3 py-2"
-            placeholder="Email" required />
-        </div>
-        <div class="mb-4">
-          <label for="" class="block mb-2">License Key</label>
-          <input v-model="licenseKey" type="text" id="" class="border rounded border-gray-300 w-full px-3 py-2"
-            placeholder="License Key" required />
-        </div>
-        <div class="flex justify-end">
-          <button type="submit" class="rounded bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4">
-            Submit
-          </button>
-        </div>
-      </form>
-    </Section>
-    <!-- License Table Section -->
-    <Section title="License List">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 border border-gray-200">
-          <thead class="bg-gray-50">
-            <th v-for="header in tableHeaders" :key="header"
-              class="text-left text-xs text-gray-500 font-medium uppercase tracking-wider px-6 py-3">
-              {{ header }}
-            </th>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="license in licenses" :key="license.id">
-              <td class="whitespace-nowrap text-sm px-6 py-4">{{ license.licenseKey }}</td>
-              <td class="whitespace-nowrap text-sm px-6 py-4" :class="statusClass(license.licenseStatus)">{{
-                license.licenseStatus }}</td>
-              <td class="whitespace-nowrap text-sm px-6 py-4">{{ formatDate(license.expirationDate) }}</td>
-              <td class="whitespace-nowrap text-sm px-6 py-4">{{ formatActivationDate(license.activationDate) }}</td>
-              <td class="whitespace-nowrap text-sm px-6 py-4">{{ license.activatedByUserEmail || '-' }}</td>
-            </tr>
-            <tr v-if="licenses.length === 0">
-              <td :colspan=tableHeaders.length class="px-6 py-4 text-sm text-gray-500 text-center">No licenses
-                available.</td>
-            </tr>
-          </tbody>
-        </table>
+    </el-card>
+
+    <!-- License Table -->
+    <el-card>
+      <div class="flex items-center justify-between mb-4">
+        <el-text size="large" tag="b" type="primary">License List</el-text>
+        <el-button @click="openModal()" size="large" :icon="Plus">
+          Add License
+        </el-button>
       </div>
-    </Section>
+
+      <el-table :data="licenses" style="width: 100%; max-height: 400px; overflow-y: auto; border-radius: 10px;"
+        height="400" empty-text="No licenses available." border>
+        <el-table-column prop="licenseKey" label="License Key" />
+
+        <el-table-column label="Status">
+          <template #default="scope">
+            <span :class="statusClass(scope.row.licenseStatus)">
+              {{ scope.row.licenseStatus }}
+            </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Expiration Date">
+          <template #default="scope">
+            {{ formatDate(scope.row.expirationDate) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Activation Date">
+          <template #default="scope">
+            {{ formatActivationDate(scope.row.activationDate) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Activated By">
+          <template #default="scope">
+            {{ scope.row.activatedByUserEmail || '-' }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Edit">
+          <template #default="scope">
+            <el-button v-if="scope.row.licenseStatus === 'Active' || scope.row.licenseStatus === 'InActive'"
+              type="primary" link size="large" :icon="Edit" @click="openModal(scope.row)">
+              Edit
+            </el-button>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Action">
+          <template #default="scope">
+            <el-button v-if="scope.row.licenseStatus === 'InActive'" type="warning" link size="large" :icon="Delete"
+              @click="deleteLicense(scope.row.id)">
+              Delete
+            </el-button>
+            <el-button v-if="scope.row.licenseStatus === 'Active'" type="danger" link size="large" :icon="Close"
+              @click="revokeLicense(scope.row.id)">
+              Revoke
+            </el-button>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Send Email">
+          <template #default="scope">
+            <el-button v-if="scope.row.licenseStatus === 'InActive'" type="success" link size="large" :icon="Message"
+              @click="openSendEmailModal(scope.row)">
+              Send Email
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+    <!-- License Modal -->
+    <el-dialog v-model="showModal" :title="isEditing ? 'Edit License' : 'Add License'" width="500px" center>
+      <el-form @submit.prevent="updateLicense" label-position="top">
+        <el-form-item label="Expiration Date" required>
+          <el-date-picker v-model="license.expirationDate" type="date" placeholder="Select date" style="width: 100%" />
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="closeModal" type="default">Cancel</el-button>
+          <el-button type="primary" @click="updateLicense">Save</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
+    <!-- Sende Email Modal -->
+    <el-dialog v-model="showSendEmailModal" title="Send License Key to Email" width="500px" center>
+      <el-form @submit.prevent="handleSendEmail" label-position="top">
+        <el-form-item label="Email" required>
+          <el-input v-model="email" placeholder="Enter email" type="email" />
+        </el-form-item>
+        <el-form-item label="License Key">
+          <el-input v-model="licenseKey" readonly />
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="closeSendEmailModal" type="default">Cancel</el-button>
+          <el-button type="primary" @click="handleSendEmail">Submit</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
   </div>
 </template>
 
 <script setup>
-import Section from '@/components/Section.vue';
-import DashboardCard from '@/components/DashboardCard.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ExtensionService } from '@/services/extensions';
 import { LicenseService } from '@/services/licenses';
 import { RubyService } from '@/services/ruby';
 import { FileDownloader } from '@/services/utility/filedownloader';
+import { Download, Document, Edit, Plus, Delete, Close, Message } from '@element-plus/icons-vue'
+import ExtensionDocument from '@/components/ExtensionDocument.vue'
 
 const route = useRoute();
 const extensionId = ref(-1)
@@ -94,8 +177,20 @@ const extension = ref({});
 const licenses = ref([]);
 const email = ref('');
 const licenseKey = ref('');
-
-const tableHeaders = ['License Key', 'Status', 'Expiration Date', 'Activation Date', 'Activated By'];
+const showModal = ref(false);
+const showSendEmailModal = ref(false);
+const selectedLicense = ref(null);
+const license = ref({
+  id: '',
+  licenseKey: '',
+  activationDate: '',
+  expirationDate: '',
+  licenseStatus: '',
+  extensionId: '',
+  activatedByUserEmail: ''
+});
+const showDocument = ref(false);
+const isEditing = ref(false);
 
 onMounted(async () => {
   extensionId.value = route.params.id;
@@ -120,25 +215,92 @@ const statusClass = (status) => ({
   'Revoked': 'text-red-500'
 }[status] || 'text-gray-500');
 
+const downloadRubyFile = async () => {
+  try {
+    const data = await RubyService.downloadRubyFile(extensionId.value, extension.value.moduleName);
+    FileDownloader.downloadFile(data, 'AIExtensionsCenter.zip');
+  } catch (error) {
+    alert('Failed to download file.');
+  }
+};
+
+const updateLicense = async () => {
+  if (license.value.id) {
+    await LicenseService.updateLicense(license.value.id, license.value);
+  } else {
+    await LicenseService.createLicense({ expirationDate: license.value.expirationDate, extensionId: extensionId.value });
+  }
+  licenses.value = await LicenseService.fetchLicensesByExtensionId(extensionId.value);
+  closeModal();
+};
+
+const deleteLicense = async (licenseId) => {
+  await LicenseService.deleteLicense(licenseId);
+  licenses.value = await LicenseService.fetchLicensesByExtensionId(extensionId.value);
+};
+
+const revokeLicense = async (licenseId) => {
+  const isConfirmed = window.confirm('Are you sure you want to revoke this license?');
+  if (!isConfirmed) return;
+  await LicenseService.deactivateLicense(licenseId);
+  licenses.value = await LicenseService.fetchLicensesByExtensionId(extensionId.value);
+};
+
+const openModal = (selectedLicense = null) => {
+  if (selectedLicense) {
+    license.value = selectedLicense;
+    isEditing.value = true;
+  } else {
+    license.value = {
+      id: '',
+      licenseKey: '',
+      activationDate: '',
+      expirationDate: '',
+      licenseStatus: '',
+      extensionId: extensionId.value,
+      activatedByUserEmail: ''
+    };
+    isEditing.value = false;
+  }
+  showModal.value = true;
+};
+
+
+const closeModal = () => {
+  license.value = {
+    id: '',
+    licenseKey: '',
+    activationDate: '',
+    expirationDate: '',
+    licenseStatus: '',
+    extensionId: '',
+    activatedByUserEmail: ''
+  };
+  showModal.value = false;
+}
+
+const openSendEmailModal = (license) => {
+  selectedLicense.value = license;
+  email.value = '';
+  licenseKey.value = license.licenseKey;
+  showSendEmailModal.value = true;
+};
+const closeSendEmailModal = () => {
+  showSendEmailModal.value = false;
+  selectedLicense.value = null;
+};
 const handleSendEmail = async () => {
   const emailData = {
     email: email.value,
-    licenseKey: licenseKey.value
+    licenseKey: selectedLicense.value.licenseKey,
   };
   try {
     await LicenseService.sendLicenseEmail(emailData);
     alert('Email sent successfully!');
+    closeSendEmailModal();
   } catch (error) {
     alert('Failed to send email.');
   }
 };
 
-const downloadRubyFile = async () => {
-  try {
-    const data = await RubyService.downloadRubyFile(extensionId.value);
-    FileDownloader.downloadFile(data, 'AiExtensionsCenter.rb');
-  } catch (error) {
-    alert('Failed to download file.');
-  }
-};
 </script>
